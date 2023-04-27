@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import {fetchLikedFormSubmissions} from "../../service/mockServer";
 
 export default function Content() {
   return (

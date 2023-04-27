@@ -3,6 +3,7 @@ import Chance from 'chance';
 
 const chance = new Chance();
 const callbacks = [];
+console.log("callbacks: ", callbacks);
 function randomPercent() {
   return Math.floor(Math.random() * 100);
 }
@@ -50,7 +51,7 @@ export async function fetchLikedFormSubmissions() {
  * Saves a liked form submission to the server.
  *
  * @params {FormSubmission} formSubmission
- * 
+ *
  * @return {Promise} resolves or rejects with a simple message.
  * We have a flaky server and requests will fail 10
  * percent of the time.

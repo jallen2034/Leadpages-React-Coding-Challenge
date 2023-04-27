@@ -1,8 +1,8 @@
 import React from 'react';
 import Container from '@mui/material/Container';
 
-import Header from './Header';
-import Content from './Content';
+import Header from '../components/header/Header';
+import Content from '../components/content/Content';
 
 function App() {
   return (
