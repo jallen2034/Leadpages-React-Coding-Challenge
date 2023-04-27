@@ -2,18 +2,14 @@ import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import Snackbar from '@mui/material/Snackbar';
 import {Alert} from "@mui/material";
 
 export default function Content(props) {
   const {postUpdated, setPostUpdated} = props;
-  const [likedToasts, setLikedToasts] = useState([]);
   const [mostRecentSubmission, setMostRecentSubmission] = useState('');
   const [open, setOpen] = React.useState(false);
-  console.log("likedToasts: ", likedToasts);
-  console.log("mostRecentSubmission: ", mostRecentSubmission);
+
 
   /* Run this hook when this component initially mounts
    * Add an event listener to the content component/page that listens for then the value of 'formSubmissions'
@@ -27,28 +23,22 @@ export default function Content(props) {
     }
   }, [postUpdated]);
 
+  const handleLike = () => {
+    const likedToasts = JSON.parse(localStorage.getItem('likedToasts')) || [];
+    const updatedLikedToasts = [...likedToasts, mostRecentSubmission];
+    localStorage.setItem('likedToasts', JSON.stringify(updatedLikedToasts));
+    setOpen(false);
+  };
+
+  // Get the most recent liked toasts saved in localStorage vs a useState hook to remember between page renders
+  const likedToasts = JSON.parse(localStorage.getItem('likedToasts')) || [];
+
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
   };
-
-  const action = (
-    <React.Fragment>
-      <Button color="secondary" size="small" onClick={handleClose}>
-        UNDO
-      </Button>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleClose}
-      >
-        <CloseIcon fontSize="small"/>
-      </IconButton>
-    </React.Fragment>
-  );
 
   return (
     <Box sx={{marginTop: 3}}>
@@ -71,12 +61,32 @@ export default function Content(props) {
             Last Name: {mostRecentSubmission.data ? mostRecentSubmission.data.lastName : ''}
             <br />
             Email: {mostRecentSubmission.data ? mostRecentSubmission.data.email : ''}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+              <Button variant="outlined" onClick={handleLike}>Like</Button>
+            </div>
           </Alert>
         </Snackbar>
       </div>
-      <Typography variant="h4">Liked Form Submissions</Typography>
       <Typography variant="body1" sx={{fontStyle: 'italic', marginTop: 1}}>
-        TODO: List of liked submissions here (delete this line)
+        <Typography variant="h4">Liked Form Submissions</Typography>
+        {likedToasts.length === 0 ? (
+          <Typography variant="body1" sx={{fontStyle: 'italic', marginTop: 1}}>
+            You have no liked submissions yet
+          </Typography>
+        ) : (
+          <ul style={{listStyle: 'none', paddingLeft: 0}}>
+            {likedToasts.map((submission, index) => (
+              <li key={index} style={{marginBottom: '16px'}}>
+                <Typography variant="body1" sx={{fontWeight: 'bold'}}>
+                  {submission.data.firstName} {submission.data.lastName}
+                </Typography>
+                <Typography variant="body2" sx={{fontStyle: 'italic'}}>
+                  {submission.data.email}
+                </Typography>
+              </li>
+            ))}
+          </ul>
+        )}
       </Typography>
     </Box>
   );
