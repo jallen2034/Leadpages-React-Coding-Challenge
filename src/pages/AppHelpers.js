@@ -1,4 +1,4 @@
-import {fetchLikedFormSubmissions} from "../../service/mockServer";
+import {fetchLikedFormSubmissions} from "../service/mockServer";
 
 export const fetchUpToDatePosts = async (
   setMostRecentSubmission,

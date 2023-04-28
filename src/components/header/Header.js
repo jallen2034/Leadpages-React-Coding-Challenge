@@ -12,7 +12,7 @@ import Snackbar from '@mui/material/Snackbar';
 import {
   createMockFormSubmission,
 } from '../../service/mockServer';
-import {submitForm} from "./helpers";
+import {submitForm} from "./Helpers";
 import {Alert} from "@mui/material";
 
 export default function Header(props) {
@@ -53,16 +53,16 @@ export default function Header(props) {
         open={openError}
         autoHideDuration={6000}
         onClose={handleClose}
-        anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
-      >
-        <Alert
-          onClose={handleClose}
-          severity="error"
-          sx={{width: '100%'}}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          Something went wrong when creating a New Submission. Please try again.
-        </Alert>
-      </Snackbar>
+      <Alert
+        onClose={handleClose}
+        severity="error"
+        sx={{ width: '100%', fontFamily: 'Montserrat, sans-serif', fontWeight: 500 }}
+      >
+        <strong>Oops! Something went wrong while creating a new submission. Please try again later.</strong>
+      </Alert>
+    </Snackbar>
       <AppBar position="static">
         <Toolbar>
           <IconButton
