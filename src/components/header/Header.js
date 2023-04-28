@@ -6,16 +6,24 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import CloseIcon from '@mui/icons-material/Close';
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from "@mui/icons-material/Save";
 import Snackbar from '@mui/material/Snackbar';
 import {
   createMockFormSubmission,
 } from '../../service/mockServer';
 import {submitForm} from "./helpers";
+import {Alert} from "@mui/material";
 
 export default function Header(props) {
-  const { setPostUpdated } = props;
-  const [openError, setOpenError] = useState(false);
+  const {
+    setPostUpdated,
+    setLoading,
+    loading,
+    openError,
+    setOpenError,
+    open,
+  } = props; // Prop drilling
 
   /* This function is triggered when the user clicks on the 'New Submission' button.
    * It calls the submitForm() function, passing in the createMockFormSubmission callback
@@ -23,11 +31,12 @@ export default function Header(props) {
    * for the new submission. The submission is then sent to the server via this callback. */
   const handleSubmitNewMessage = async () => {
     try {
-      await submitForm(createMockFormSubmission);
-      setPostUpdated(true);
-    } catch (error) {
-      console.error(error);
+      setLoading(true);
+      await submitForm(createMockFormSubmission, setOpenError, setPostUpdated, setLoading);
+    } catch (e) {
+      setLoading(false);
       setOpenError(true);
+      console.error(e);
     }
   }
 
@@ -38,31 +47,22 @@ export default function Header(props) {
     setOpenError(false);
   };
 
-  const action = (
-    <React.Fragment>
-      <Button color="secondary" size="small" onClick={handleClose}>
-        UNDO
-      </Button>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleClose}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </React.Fragment>
-  );
-
   return (
     <Box sx={{flexGrow: 1}}>
       <Snackbar
         open={openError}
         autoHideDuration={6000}
         onClose={handleClose}
-        message="Something went wrong when submitting a post, please try again"
-        action={action}
-      />
+        anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="error"
+          sx={{width: '100%'}}
+        >
+          Something went wrong when creating a New Submission. Please try again.
+        </Alert>
+      </Snackbar>
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -71,19 +71,33 @@ export default function Header(props) {
             aria-label="menu"
             sx={{marginRight: 2}}
           >
-            <MenuIcon />
+            <MenuIcon/>
           </IconButton>
           <Typography variant="h6" sx={{flexGrow: 1}}>
             Toast Exercise
           </Typography>
-          <Button
-            variant="contained"
-            size="small"
-            color="secondary"
-            onClick={(event) => handleSubmitNewMessage()}
-          >
-            New Submission
-          </Button>
+          {loading ?
+            <LoadingButton
+              disabled
+              loading
+              className="cancelButtonDefault"
+              loadingPosition="start"
+              startIcon={<SaveIcon/>}
+              variant="outlined"
+            >
+              Submitting...
+            </LoadingButton>
+            :
+            <Button
+              variant="contained"
+              size="small"
+              color="secondary"
+              onClick={() => handleSubmitNewMessage()}
+              disabled={!!openError || open || loading}
+            >
+              New Submission
+            </Button>
+          }
         </Toolbar>
       </AppBar>
     </Box>

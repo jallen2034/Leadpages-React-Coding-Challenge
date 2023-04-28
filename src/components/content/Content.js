@@ -4,23 +4,9 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import {Alert} from "@mui/material";
-import {fetchUpToDatePosts} from "./helpers";
 
 export default function Content(props) {
-  const {postUpdated, setPostUpdated} = props;
-  const [mostRecentSubmission, setMostRecentSubmission] = useState('');
-  const [open, setOpen] = React.useState(false);
-
-  /*
-   * This hook adds an event listener to the content component/page, listening for changes to the 'formSubmissions'
-   * value in the browser's localStorage when a new submission is sent to the API. It then updates the most recent
-   * submission, resets the postUpdated state, and opens up the submission dialog/snackbar.
-   */
-  useEffect(() => {
-    if (postUpdated) {
-      fetchUpToDatePosts(setMostRecentSubmission, setPostUpdated, setOpen);
-    }
-  }, [postUpdated]);
+  const {open, setOpen, mostRecentSubmission} = props;
 
   // Handle when a user 'likes' a form submission
   const handleLike = () => {

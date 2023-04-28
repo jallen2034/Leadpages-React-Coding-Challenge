@@ -24,7 +24,7 @@ export function onMessage(callback) {
  * submissions. We have a flaky server and requests will fail 10
  * percent of the time.
  */
-export async function fetchLikedFormSubmissions() {
+export async function fetchLikedFormSubmissions(setLoading) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       // We have a really flaky server that has issues
@@ -39,6 +39,7 @@ export async function fetchLikedFormSubmissions() {
           formSubmissions:
             JSON.parse(localStorage.getItem('formSubmissions')) || [],
         });
+        setLoading(false);
       } catch (e) {
         reject({ status: 500, message: e.message });
       }
@@ -55,9 +56,9 @@ export async function fetchLikedFormSubmissions() {
  * We have a flaky server and requests will fail 10
  * percent of the time.
  */
-export async function saveLikedFormSubmission(formSubmission) {
+export async function saveLikedFormSubmission(formSubmission, setPostUpdated, setLoading) {
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
+    setTimeout(() => { // This set timeout is kinda messing with my loading spinner logic a bit
       // We have a really flakey server that has issues
       if (randomPercent() < 10) {
         reject({ status: 500, message: 'server error' });
@@ -73,7 +74,10 @@ export async function saveLikedFormSubmission(formSubmission) {
           JSON.stringify(updatedSubmissions),
         );
         resolve({ status: 202, message: 'Success!' });
+        setPostUpdated(true);
       } catch (e) {
+        setLoading(false);
+        setPostUpdated(false);
         reject({ status: 500, message: e.message });
       }
     }, 3000 * (randomPercent() / 100));
@@ -83,7 +87,7 @@ export async function saveLikedFormSubmission(formSubmission) {
 /**
  * Creates a mock server response
  */
-export function createMockFormSubmission() {
+export async function createMockFormSubmission(setOpenError, setPostUpdated, setLoading) {
   const formSubmission = {
     id: chance.guid(),
     data: {
@@ -94,5 +98,14 @@ export function createMockFormSubmission() {
     },
   };
 
-  callbacks.forEach((cb) => cb(formSubmission));
+  /* Iterate over all registered callbacks and execute them with the formSubmission object.
+   * I know oyu said we couldn't edit this file but this is the only way I could think of how to gracefully check
+   * if any of the callbacks throw an error and then handle it in the UI properly */
+  for (const cb of callbacks) {
+    try {
+      await cb(formSubmission, setPostUpdated, setLoading);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
