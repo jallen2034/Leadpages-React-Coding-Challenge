@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -15,15 +15,14 @@ import {submitForm} from "./helpers";
 
 export default function Header(props) {
   const { setPostUpdated } = props;
-  const [openError, setOpenError] = React.useState(false);
+  const [openError, setOpenError] = useState(false);
 
   /* This function is triggered when the user clicks on the 'New Submission' button.
    * It calls the submitForm() function, passing in the createMockFormSubmission callback
    * function, which generates random data (first name, last name, email, and likes)
    * for the new submission. The submission is then sent to the server via this callback. */
-  const handleSubmitNewMessage = async (event) => {
+  const handleSubmitNewMessage = async () => {
     try {
-      event.preventDefault();
       await submitForm(createMockFormSubmission);
       setPostUpdated(true);
     } catch (error) {
@@ -36,7 +35,6 @@ export default function Header(props) {
     if (reason === 'clickaway') {
       return;
     }
-
     setOpenError(false);
   };
 
@@ -82,7 +80,7 @@ export default function Header(props) {
             variant="contained"
             size="small"
             color="secondary"
-            onClick={(event) => handleSubmitNewMessage(event)}
+            onClick={(event) => handleSubmitNewMessage()}
           >
             New Submission
           </Button>

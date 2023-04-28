@@ -4,28 +4,28 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import {Alert} from "@mui/material";
+import {fetchUpToDatePosts} from "./helpers";
 
 export default function Content(props) {
   const {postUpdated, setPostUpdated} = props;
   const [mostRecentSubmission, setMostRecentSubmission] = useState('');
   const [open, setOpen] = React.useState(false);
 
-
-  /* Run this hook when this component initially mounts
-   * Add an event listener to the content component/page that listens for then the value of 'formSubmissions'
-   * in the browsers localStorage changes when a new submission is  sent to the API */
+  /*
+   * This hook adds an event listener to the content component/page, listening for changes to the 'formSubmissions'
+   * value in the browser's localStorage when a new submission is sent to the API. It then updates the most recent
+   * submission, resets the postUpdated state, and opens up the submission dialog/snackbar.
+   */
   useEffect(() => {
     if (postUpdated) {
-      const updatedFormSubmissions = JSON.parse(localStorage.getItem('formSubmissions'));
-      setMostRecentSubmission(updatedFormSubmissions[updatedFormSubmissions.length - 1]);
-      setPostUpdated(false);
-      setOpen(true);
+      fetchUpToDatePosts(setMostRecentSubmission, setPostUpdated, setOpen);
     }
   }, [postUpdated]);
 
+  // Handle when a user 'likes' a form submission
   const handleLike = () => {
     const likedToasts = JSON.parse(localStorage.getItem('likedToasts')) || [];
-    const updatedLikedToasts = [...likedToasts, mostRecentSubmission];
+    const updatedLikedToasts = [...likedToasts, mostRecentSubmission]; // Add form submission  to the users liked toasts
     localStorage.setItem('likedToasts', JSON.stringify(updatedLikedToasts));
     setOpen(false);
   };
@@ -47,7 +47,7 @@ export default function Content(props) {
           open={open}
           autoHideDuration={6000}
           onClose={handleClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
         >
           <Alert
             onClose={handleClose}
@@ -55,13 +55,13 @@ export default function Content(props) {
             sx={{width: '100%'}}
           >
             A new form was just generated for this user:
-            <br />
+            <br/>
             First Name: {mostRecentSubmission.data ? mostRecentSubmission.data.firstName : ''}
-            <br />
+            <br/>
             Last Name: {mostRecentSubmission.data ? mostRecentSubmission.data.lastName : ''}
-            <br />
+            <br/>
             Email: {mostRecentSubmission.data ? mostRecentSubmission.data.email : ''}
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+            <div style={{display: 'flex', justifyContent: 'center', marginTop: '16px'}}>
               <Button variant="outlined" onClick={handleLike}>Like</Button>
             </div>
           </Alert>
