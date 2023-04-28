@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Container from '@mui/material/Container';
 import Header from '../components/header/Header';
 import Content from '../components/content/Content';
-import {fetchUpToDatePosts} from "../components/content/helpers";
+import {fetchUpToDatePosts} from "./AppHelpers";
 
 function App() {
   const [postUpdated, setPostUpdated] = useState(false);
