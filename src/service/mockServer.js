@@ -3,7 +3,6 @@ import Chance from 'chance';
 
 const chance = new Chance();
 const callbacks = [];
-console.log("callbacks: ", callbacks);
 function randomPercent() {
   return Math.floor(Math.random() * 100);
 }
@@ -91,7 +90,7 @@ export function createMockFormSubmission() {
       email: chance.email(),
       firstName: chance.first(),
       lastName: chance.last(),
-      liked: false,
+      liked: false, // Do I need this?
     },
   };
 
