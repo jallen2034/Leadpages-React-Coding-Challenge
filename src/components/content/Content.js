@@ -14,7 +14,6 @@ export default function Content(props) {
   const [expanded, setExpanded] = useState('panel1'); // for the Accordion
 
   const handleChangeAccordion = (panel) => (event, isExpanded) => {
-    console.log("panel: ", panel);
     setExpanded(isExpanded ? panel : false);
   };
 
