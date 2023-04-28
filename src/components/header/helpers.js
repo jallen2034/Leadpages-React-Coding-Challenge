@@ -7,13 +7,22 @@ import {onMessage, saveLikedFormSubmission} from "../../service/mockServer";
  * the 'saveLikedFormSubmission' callback function stored in our callbacks array to then send the generated form data to our server. */
 onMessage(saveLikedFormSubmission);
 
-export const submitForm = async (createMockFormSubmissionCB) => {
+export const submitForm = async (
+  createMockFormSubmissionCB,
+  setOpenError,
+  setLoading,
+  setPostUpdated
+) => {
   if (!createMockFormSubmissionCB) {
     return;
   }
   try {
-    await createMockFormSubmissionCB(); // call the createMockFormSubmission cb function
+    await createMockFormSubmissionCB(
+      setOpenError,
+      setLoading,
+      setPostUpdated
+    ); // call the createMockFormSubmission cb function
   } catch (error) {
-    console.log("Error: ", error)
+    throw error;
   }
 }
