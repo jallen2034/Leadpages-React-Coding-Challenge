@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
@@ -11,29 +11,38 @@ import './Content.css';
 
 export default function Content(props) {
   const {open, setOpen, mostRecentSubmission} = props;
-  const [expanded, setExpanded] = useState('panel1'); // for the Accordion
+  const [expanded, setExpanded] = useState('panel1'); // For the Accordion
+  const [likedToasts, setLikedToasts] = useState([]); // Initializing state to store liked toasts in this component
 
   const handleChangeAccordion = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  // Handle when a user 'likes' a form submission
+  // Handle when a user 'likes' a form submission and update it in our components state
   const handleLike = () => {
-    const likedToasts = JSON.parse(localStorage.getItem('likedToasts')) || [];
-    const updatedLikedToasts = [...likedToasts, mostRecentSubmission]; // Add form submission  to the users liked toasts
-    localStorage.setItem('likedToasts', JSON.stringify(updatedLikedToasts));
+    setLikedToasts([...likedToasts, mostRecentSubmission]); // Add form submission  to the users liked toasts
     setOpen(false);
   };
 
-  // When (and only when) the component mounts, collapse the Accordion when the liked posts length gets longer than 8 posts
+  /* When this component mounts, retrieve the previously liked toasts from localStorage, and set them as initial state
+   * in our app. only read this from localStorage ONCE when the component initially mounts to improve performance */
   useEffect(() => {
-    if (likedToasts.length > 8) {
+    const likedToastsLocalStorage = JSON.parse(localStorage.getItem('likedToasts'));
+    if (likedToastsLocalStorage?.length > 8) {
       setExpanded(false);
     }
-  }, [])
+    if (likedToastsLocalStorage?.length) {
+      setLikedToasts(likedToastsLocalStorage);
+    }
+  }, []);
 
-  // Get the most recent liked toasts saved in localStorage vs a useState hook to remember between page renders
-  const likedToasts = JSON.parse(localStorage.getItem('likedToasts')) || [];
+  /* Save our liked toasts into localStorage before the component unmounts. We do this to
+   * ensure persistence between page refreshes and optimize our apps render performance */
+  useEffect(() => {
+    if (likedToasts?.length > 0) { // Only save the liked toasts to localstorage if there is one to save
+      localStorage.setItem('likedToasts', JSON.stringify(likedToasts));
+    }
+  }, [likedToasts])
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -49,23 +58,23 @@ export default function Content(props) {
           open={open}
           autoHideDuration={6000}
           onClose={handleClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
         >
           <Alert
             onClose={handleClose}
             severity="success"
-            sx={{ width: '100%' }}
+            sx={{width: '100%'}}
           >
             <strong>A new form has been generated for you:</strong>
-            <br />
-            <br />
+            <br/>
+            <br/>
             • <strong>First Name:</strong> {mostRecentSubmission.data ? mostRecentSubmission.data.firstName : ''}
-            <br />
+            <br/>
             • <strong>Last Name:</strong> {mostRecentSubmission.data ? mostRecentSubmission.data.lastName : ''}
-            <br />
+            <br/>
             • <strong>Email:</strong> {mostRecentSubmission.data ? mostRecentSubmission.data.email : ''}
             <br/>
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+            <div style={{display: 'flex', justifyContent: 'center', marginTop: '16px'}}>
               <Button style={{marginTop: '8px'}} variant="outlined" onClick={handleLike}>Like</Button>
             </div>
           </Alert>
@@ -74,7 +83,7 @@ export default function Content(props) {
       <div>
         <Typography variant="body1" sx={{fontStyle: 'italic', marginTop: 1}}>
           <Typography variant="h4" sx={{fontWeight: 'bold', marginBottom: '12px'}}>Liked Form Submissions</Typography>
-          {likedToasts.length === 0 ? (
+          {likedToasts && likedToasts.length === 0 ? (
             <Typography sx={{
               fontSize: 18,
               fontWeight: 'bold',
@@ -101,7 +110,7 @@ export default function Content(props) {
                 </AccordionSummary>
                 <AccordionDetails>
                   <ul style={{listStyle: 'none', paddingLeft: 0}}>
-                    {likedToasts.map((submission, index) => (
+                    {likedToasts && likedToasts.map((submission, index) => (
                       <li key={index} style={{marginBottom: '16px'}}>
                         <Typography variant="body1" sx={{fontWeight: 'bold'}}>
                           {submission.data.firstName} {submission.data.lastName}
